@@ -1,0 +1,59 @@
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_VERTICES 20
+void printSolution(int path[], int n) {
+ printf("Hamiltonian Cycle: ");
+ for (int i = 0; i < n; i++) {
+ printf("%d ", path[i]);
+ }
+ printf("%d\n", path[0]);
+}
+bool isSafe(int v, int graph[MAX_VERTICES][MAX_VERTICES], int path[], int pos, int n) {
+ if (graph[path[pos - 1]][v] == 0)
+ return false;
+ for (int i = 0; i < pos; i++) {
+ if (path[i] == v)
+ return false;
+ }
+ return true;
+}
+bool hamiltonianCycleUtil(int graph[MAX_VERTICES][MAX_VERTICES], int path[], int pos, int n) {
+ if (pos == n) {
+ if (graph[path[pos - 1]][path[0]] == 1)
+ return true;
+ else
+ return false;
+ }
+ for (int v = 1; v < n; v++) {
+ if (isSafe(v, graph, path, pos, n)) {
+ path[pos] = v;
+ if (hamiltonianCycleUtil(graph, path, pos + 1, n))
+ return true;
+ path[pos] = -1; // Backtrack
+ }
+ }
+ return false;
+}
+void hamiltonianCycle(int graph[MAX_VERTICES][MAX_VERTICES], int n) {
+ int path[MAX_VERTICES];
+ for (int i = 0; i < n; i++) {
+ path[i] = -1;
+ }
+ path[0] = 0;
+ if (hamiltonianCycleUtil(graph, path, 1, n)) {
+ printSolution(path, n);
+ } else {
+ printf("No Hamiltonian Cycle found.\n");
+ }
+}
+int main() {
+ int n;
+ printf("Enter the number of vertices in the graph: ");
+ scanf("%d", &n);
+ printf("Enter the adjacency matrix of the graph:\n");
+ int graph[MAX_VERTICES][MAX_VERTICES];
+ for (int i = 0; i < n; i++) {
+ for (int j = 0; j < n; j++) {
+ scanf("%d", &graph[i][j]);
+ }
+ } hamiltonianCycle(graph, n); return 0;}

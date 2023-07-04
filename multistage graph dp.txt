@@ -1,0 +1,60 @@
+#define MAX_STATES 100
+#define MAX_TRANSITIONS 100
+typedef struct {
+    int numStates;
+    int numTransitions;
+    int transitionMatrix[MAX_STATES][MAX_TRANSITIONS];
+    int costMatrix[MAX_STATES][MAX_TRANSITIONS];
+} MultistateGraph;
+MultistateGraph* createMultistateGraph(int numStates, int numTransitions) {
+    MultistateGraph* graph = (MultistateGraph*)malloc(sizeof(MultistateGraph));
+    graph->numStates = numStates;
+    graph->numTransitions = numTransitions;
+
+    // Initialize transition matrix and cost matrix with 0
+    memset(graph->transitionMatrix, 0, sizeof(graph->transitionMatrix));
+    memset(graph->costMatrix, 0, sizeof(graph->costMatrix));
+
+    return graph;
+}
+void addTransition(MultistateGraph* graph, int fromState, int toState, int cost) {
+    graph->transitionMatrix[fromState][toState] = 1;
+    graph->costMatrix[fromState][toState] = cost;
+}
+int findMinimumCostPath(MultistateGraph* graph) {
+    int numStates = graph->numStates;
+    int numTransitions = graph->numTransitions;
+
+    int dp[MAX_STATES][MAX_TRANSITIONS];
+    memset(dp, 0, sizeof(dp));
+
+    // Initialize the last column of the dynamic programming table
+    for (int state = 0; state < numStates; state++) {
+        dp[state][numTransitions - 1] = graph->costMatrix[state][numTransitions - 1];
+    }
+
+    // Fill the dynamic programming table from right to left
+    for (int transition = numTransitions - 2; transition >= 0; transition--) {
+        for (int state = 0; state < numStates; state++) {
+            dp[state][transition] = graph->costMatrix[state][transition] +
+                                    dp[state][transition + 1];
+
+            for (int nextState = 0; nextState < numStates; nextState++) {
+                if (graph->transitionMatrix[state][nextState] == 1) {
+                    dp[state][transition] = fmin(dp[state][transition],
+                                                 graph->costMatrix[state][transition] +
+                                                 dp[nextState][transition + 1]);
+                }
+            }
+        }
+    }
+
+    // Find the minimum cost path from the first transition
+    int minCost = INT_MAX;
+    for (int state = 0; state < numStates; state++) {
+        minCost = fmin(minCost, dp[state][0]);
+    }
+
+    return minCost;
+}
+

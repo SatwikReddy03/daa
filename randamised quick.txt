@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Function to swap two elements
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to partition the array using a random pivot
+int partition(int arr[], int low, int high) {
+    // Select a random pivot
+    srand(time(NULL));
+    int randomIndex = low + rand() % (high - low + 1);
+    int pivot = arr[randomIndex];
+
+    // Move the pivot to the end of the array
+    swap(&arr[randomIndex], &arr[high]);
+
+    // Partition the array
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+
+    // Move the pivot to its final position
+    swap(&arr[i + 1], &arr[high]);
+
+    return i + 1;
+}
+
+// Function to perform randomized quicksort
+void quicksort(int arr[], int low, int high) {
+    if (low < high) {
+        // Partition the array
+        int pivotIndex = partition(arr, low, high);
+
+        // Recursively sort the left and right subarrays
+        quicksort(arr, low, pivotIndex - 1);
+        quicksort(arr, pivotIndex + 1, high);
+    }
+}
+
+// Function to print the array
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int size;
+    printf("Enter the size of the array: ");
+    scanf("%d", &size);
+
+    int arr[size];
+    printf("Enter the elements of the array: ");
+    for (int i = 0; i < size; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("Original array: ");
+    printArray(arr, size);
+
+    quicksort(arr, 0, size - 1);
+
+    printf("Sorted array: ");
+    printArray(arr, size);
+
+    return 0;
+}

@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <limits.h>
+int minCoins(int coins[], int numCoins, int amount) {
+ int dp[amount + 1];
+ dp[0] = 0;
+ for (int i = 1; i <= amount; i++) {
+ dp[i] = INT_MAX;
+ }
+ for (int i = 1; i <= amount; i++) {
+ for (int j = 0; j < numCoins; j++) {
+ if (coins[j] <= i) {
+ int subproblem = dp[i - coins[j]];
+ if (subproblem != INT_MAX && subproblem + 1 < dp[i]) {
+ dp[i] = subproblem + 1;
+ }
+ }
+ }
+ }
+ return dp[amount];
+}
+int main() {
+ int numCoins;
+ printf("Enter the number of coin denominations: ");
+ scanf("%d", &numCoins);
+ int coins[numCoins];
+ printf("Enter the coin denominations:\n");
+ for (int i = 0; i < numCoins; i++) {
+ scanf("%d", &coins[i]);
+ }
+ int amount;
+ printf("Enter the amount for which to make change: ");
+ scanf("%d", &amount);
+ int minNumCoins = minCoins(coins, numCoins, amount);
+ printf("Minimum number of coins needed: %d\n", minNumCoins);
+ return 0;
+}

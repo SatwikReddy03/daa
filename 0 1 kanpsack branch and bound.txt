@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_ITEMS 100
+typedef struct {
+ int weight;
+ int value;
+} Item;
+int maxProfit = 0;
+int bestItems[MAX_ITEMS];
+int numItems;
+int capacity;
+void branchAndBoundKnapsack(Item items[], int level, int currentWeight, int currentValue, bool selected[]) {
+ if (currentWeight > capacity) {
+ return;
+ }
+ if (currentValue > maxProfit) {
+ maxProfit = currentValue;
+ for (int i = 0; i < numItems; i++) {
+ bestItems[i] = selected[i];
+ }
+ }
+ if (level == numItems) {
+ return;
+ }
+ double bound = currentValue;
+ int remainingWeight = capacity - currentWeight;
+ int i = level;
+ while (i < numItems && remainingWeight > 0) {
+ if (items[i].weight <= remainingWeight) {
+ bound += items[i].value;
+ remainingWeight -= items[i].weight;
+ } else {
+ bound += (double)items[i].value / items[i].weight * remainingWeight;
+ remainingWeight = 0;
+ }
+ i++;
+ }
+ if (bound <= maxProfit) {
+ return;
+ }
+ selected[level] = true;
+ branchAndBoundKnapsack(items, level + 1, currentWeight + items[level].weight, currentValue +
+items[level].value, selected);
+ selected[level] = false;
+ branchAndBoundKnapsack(items, level + 1, currentWeight, currentValue, selected);
+}
+void knapsack(Item items[], int num, int cap) {
+ numItems = num;
+ capacity = cap;
+ bool selected[MAX_ITEMS] = { false };
+ branchAndBoundKnapsack(items, 0, 0, 0, selected);
+ printf("Optimal Items: ");
+ for (int i = 0; i < numItems; i++) {
+ if (bestItems[i]) {
+ printf("%d ", i);
+ }
+ }
+ printf("\n");
+ printf("Optimal Profit: %d\n", maxProfit);
+}
+int main() {
+ int num, cap;
+ printf("Enter the number of items: ");
+ scanf("%d", &num);
+ printf("Enter the capacity of the knapsack: ");
+ scanf("%d", &cap);
+ Item items[MAX_ITEMS];
+ printf("Enter the weight and value of each item:\n");
+ for (int i = 0; i < num; i++) {
+ scanf("%d %d", &items[i].weight, &items[i].value);
+ }
+ knapsack(items, num, cap);
+ return 0;
+}

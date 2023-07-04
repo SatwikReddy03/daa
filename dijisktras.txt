@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+
+#define MAX_VERTICES 100
+
+// Structure to represent a graph
+typedef struct {
+    int numVertices;
+    int adjacencyMatrix[MAX_VERTICES][MAX_VERTICES];
+} Graph;
+
+// Function to create a graph
+Graph* createGraph(int numVertices) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->numVertices = numVertices;
+    return graph;
+}
+
+// Function to find the vertex with the minimum distance
+int minDistance(int dist[], bool visited[], int numVertices) {
+    int min = INT_MAX, minIndex;
+
+    for (int v = 0; v < numVertices; v++) {
+        if (!visited[v] && dist[v] < min) {
+            min = dist[v];
+            minIndex = v;
+        }
+    }
+
+    return minIndex;
+}
+
+// Function to print the shortest path from source to destination
+void printPath(int parent[], int j) {
+    if (parent[j] == -1)
+        return;
+
+    printPath(parent, parent[j]);
+    printf(" -> %d", j);
+}
+
+// Function to print the shortest paths from the source vertex
+void printShortestPaths(int dist[], int parent[], int src, int numVertices) {
+    printf("Shortest Paths from vertex %d:\n", src);
+    for (int v = 0; v < numVertices; v++) {
+        if (dist[v] != INT_MAX) {
+            printf("Path to vertex %d: %d", v, src);
+            printPath(parent, v);
+            printf(", Distance: %d\n", dist[v]);
+        } else {
+            printf("Path to vertex %d: No path\n", v);
+        }
+    }
+}
+
+// Function to find the shortest paths from a given source vertex using Dijkstra's algorithm
+void dijkstraShortestPaths(Graph* graph, int src) {
+    int numVertices = graph->numVertices;
+    int dist[MAX_VERTICES];
+    bool visited[MAX_VERTICES];
+    int parent[MAX_VERTICES];
+
+    for (int v = 0; v < numVertices; v++) {
+        dist[v] = INT_MAX;
+        visited[v] = false;
+        parent[v] = -1;
+    }
+
+    dist[src] = 0;
+
+    for (int count = 0; count < numVertices - 1; count++) {
+        int u = minDistance(dist, visited, numVertices);
+        visited[u] = true;
+
+        for (int v = 0; v < numVertices; v++) {
+            if (!visited[v] && graph->adjacencyMatrix[u][v] && dist[u] != INT_MAX &&
+                dist[u] + graph->adjacencyMatrix[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph->adjacencyMatrix[u][v];
+                parent[v] = u;
+            }
+        }
+    }
+
+    printShortestPaths(dist, parent, src, numVertices);
+}
+
+int main() {
+    int numVertices;
+
+    printf("Enter the number of vertices: ");
+    scanf("%d", &numVertices);
+
+    Graph* graph = createGraph(numVertices);
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            scanf("%d", &graph->adjacencyMatrix[i][j]);
+        }
+    }
+
+    int sourceVertex;
+    printf("Enter the source vertex: ");
+    scanf("%d", &sourceVertex);
+
+    dijkstraShortestPaths(graph, sourceVertex);
+
+    return 0;
+}

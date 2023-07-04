@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <limits.h>
+#define MAX_SIZE 100
+int matrixChainMultiplication(int dimensions[], int i, int j, int dp[][MAX_SIZE]) {
+ if (i == j) {
+ return 0;
+ }
+ if (dp[i][j] != -1) {
+ return dp[i][j];
+ }
+ dp[i][j] = INT_MAX;
+ for (int k = i; k < j; k++) {
+ int cost = matrixChainMultiplication(dimensions, i, k, dp) +
+ matrixChainMultiplication(dimensions, k + 1, j, dp) +
+ dimensions[i - 1] * dimensions[k] * dimensions[j];
+ if (cost < dp[i][j]) {
+ dp[i][j] = cost;
+ }
+ }
+ return dp[i][j];
+}
+int main() {
+ int numMatrices;
+ printf("Enter the number of matrices: ");
+ scanf("%d", &numMatrices);
+ int dimensions[numMatrices + 1];
+ printf("Enter the dimensions of the matrices:\n");
+ for (int i = 0; i <= numMatrices; i++) {
+ scanf("%d", &dimensions[i]);
+ }
+ int dp[MAX_SIZE][MAX_SIZE];
+ for (int i = 0; i < MAX_SIZE; i++) {
+ for (int j = 0; j < MAX_SIZE; j++) {
+ dp[i][j] = -1;
+ }
+ }
+ int minimumCost = matrixChainMultiplication(dimensions, 1, numMatrices, dp);
+ printf("Minimum number of multiplications: %d\n", minimumCost);
+ return 0;
+}

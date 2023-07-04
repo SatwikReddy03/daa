@@ -1,0 +1,53 @@
+#include <stdio.h>
+
+#define MAX_NODES 100
+
+int visited[MAX_NODES];
+
+void bfs(int graph[MAX_NODES][MAX_NODES], int startNode, int numNodes) {
+    int queue[MAX_NODES];
+    int front = 0, rear = 0;
+
+    // Mark the start node as visited and enqueue it
+    visited[startNode] = 1;
+    queue[rear++] = startNode;
+
+    while (front < rear) {
+        // Dequeue a node from the queue
+        int currentNode = queue[front++];
+        printf("%d ", currentNode);
+
+        // Explore all the adjacent nodes of the current node
+        for (int i = 0; i < numNodes; i++) {
+            if (graph[currentNode][i] == 1 && visited[i] == 0) {
+                visited[i] = 1;
+                queue[rear++] = i;
+            }
+        }
+    }
+}
+
+int main() {
+    int numNodes, numEdges;
+    printf("Enter the number of nodes and edges: ");
+    scanf("%d %d", &numNodes, &numEdges);
+
+    int graph[MAX_NODES][MAX_NODES] = {0};
+
+    printf("Enter the edges (node1 node2):\n");
+    for (int i = 0; i < numEdges; i++) {
+        int node1, node2;
+        scanf("%d %d", &node1, &node2);
+        graph[node1][node2] = 1;
+        graph[node2][node1] = 1;
+    }
+
+    int startNode;
+    printf("Enter the starting node: ");
+    scanf("%d", &startNode);
+
+    printf("BFS traversal: ");
+    bfs(graph, startNode, numNodes);
+
+    return 0;
+}

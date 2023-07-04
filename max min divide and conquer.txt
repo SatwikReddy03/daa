@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <limits.h>
+
+// Structure to store the result of finding maximum and minimum
+typedef struct {
+    int max;
+    int min;
+} MaxMinPair;
+
+// Function to find the maximum and minimum of an array using divide and conquer
+MaxMinPair findMaxMin(int arr[], int low, int high) {
+    MaxMinPair result;
+    int mid;
+
+    // If there is only one element in the array
+    if (low == high) {
+        result.max = arr[low];
+        result.min = arr[low];
+        return result;
+    }
+
+    // If there are two elements in the array
+    if (low == high - 1) {
+        if (arr[low] < arr[high]) {
+            result.max = arr[high];
+            result.min = arr[low];
+        } else {
+            result.max = arr[low];
+            result.min = arr[high];
+        }
+        return result;
+    }
+
+    // If there are more than two elements in the array
+    mid = (low + high) / 2;
+    MaxMinPair leftResult = findMaxMin(arr, low, mid);
+    MaxMinPair rightResult = findMaxMin(arr, mid + 1, high);
+
+    // Compare the results of left and right subarrays
+    if (leftResult.max > rightResult.max) {
+        result.max = leftResult.max;
+    } else {
+        result.max = rightResult.max;
+    }
+
+    if (leftResult.min < rightResult.min) {
+        result.min = leftResult.min;
+    } else {
+        result.min = rightResult.min;
+    }
+
+    return result;
+}
+
+int main() {
+    int arr[] = {7, 2, 9, 4, 5, 1, 8, 6, 3};
+    int size = sizeof(arr) / sizeof(arr[0]);
+
+    MaxMinPair result = findMaxMin(arr, 0, size - 1);
+
+    printf("Array: ");
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    printf("Maximum: %d\n", result.max);
+    printf("Minimum: %d\n", result.min);
+
+    return 0;
+}

@@ -1,0 +1,71 @@
+#define MAX_VERTICES 100
+#define INF INT_MAX
+void initializeGraph(int graph[][MAX_VERTICES], int numVertices) {
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            if (i == j)
+                graph[i][j] = 0;
+            else
+                graph[i][j] = INF;
+        }
+    }
+}
+void addEdge(int graph[][MAX_VERTICES], int source, int destination, int weight) {
+    graph[source][destination] = weight;
+}
+void allPairsShortestPaths(int graph[][MAX_VERTICES], int numVertices) {
+    int dist[MAX_VERTICES][MAX_VERTICES];
+
+    // Initialize the distance matrix with the values from the graph
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            dist[i][j] = graph[i][j];
+        }
+    }
+
+    // Perform dynamic programming to find the shortest paths
+    for (int k = 0; k < numVertices; k++) {
+        for (int i = 0; i < numVertices; i++) {
+            for (int j = 0; j < numVertices; j++) {
+                if (dist[i][k] != INF && dist[k][j] != INF &&
+                    dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+    }
+
+    // Print the shortest paths
+    printf("Shortest Paths:\n");
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            if (dist[i][j] == INF)
+                printf("INF\t");
+            else
+                printf("%d\t", dist[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    int numVertices, numEdges;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &numVertices);
+    printf("Enter the number of edges in the graph: ");
+    scanf("%d", &numEdges);
+
+    int graph[MAX_VERTICES][MAX_VERTICES];
+    initializeGraph(graph, numVertices);
+
+    printf("Enter the details of each edge (source, destination, weight):\n");
+    for (int i = 0; i < numEdges; i++) {
+        int source, destination, weight;
+        scanf("%d %d %d", &source, &destination, &weight);
+        addEdge(graph, source, destination, weight);
+    }
+
+    allPairsShortestPaths(graph, numVertices);
+
+    return 0;
+}

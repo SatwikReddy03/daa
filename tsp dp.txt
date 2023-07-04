@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define MAX_CITIES 10
+#define INF INT_MAX
+
+int tsp(int graph[][MAX_CITIES], int n, int start, int visited) {
+    // Base case: If all cities have been visited, return the cost from the last city to the starting city
+    if (visited == (1 << n) - 1) {
+        return graph[start][0];
+    }
+
+    int minCost = INF;
+
+    // Try visiting all unvisited cities one by one
+    for (int i = 0; i < n; i++) {
+        if (!(visited & (1 << i))) {
+            int newVisited = visited | (1 << i);
+            int cost = graph[start][i] + tsp(graph, n, i, newVisited);
+
+            // Update the minimum cost
+            if (cost < minCost) {
+                minCost = cost;
+            }
+        }
+    }
+
+    return minCost;
+}
+
+int main() {
+    int n;
+    printf("Enter the number of cities: ");
+    scanf("%d", &n);
+
+    int graph[MAX_CITIES][MAX_CITIES];
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    int startCity;
+    printf("Enter the starting city (0 to %d): ", n - 1);
+    scanf("%d", &startCity);
+
+    int visited = 1 << startCity;
+    int minCost = tsp(graph, n, startCity, visited);
+
+    printf("Minimum cost for TSP: %d\n", minCost);
+
+    return 0;
+}

@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define TABLE_SIZE 10
+
+// Structure to represent a hash table entry
+typedef struct {
+    int key;
+    int value;
+} Entry;
+
+// Hash table structure
+typedef struct {
+    Entry* entries[TABLE_SIZE];
+} HashTable;
+
+// Function to create a new entry with the given key and value
+Entry* createEntry(int key, int value) {
+    Entry* newEntry = (Entry*)malloc(sizeof(Entry));
+    newEntry->key = key;
+    newEntry->value = value;
+    return newEntry;
+}
+
+// Function to create a new hash table
+HashTable* createHashTable() {
+    HashTable* hashTable = (HashTable*)malloc(sizeof(HashTable));
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        hashTable->entries[i] = NULL;
+    }
+    return hashTable;
+}
+
+// Function to calculate the hash value for a given key
+int hashFunction(int key) {
+    return key % TABLE_SIZE;
+}
+
+// Function to insert an entry into the hash table
+void insert(HashTable* hashTable, int key, int value) {
+    Entry* newEntry = createEntry(key, value);
+    int index = hashFunction(key);
+
+    while (hashTable->entries[index] != NULL) {
+        // Linear probing
+        index = (index + 1) % TABLE_SIZE;
+    }
+
+    hashTable->entries[index] = newEntry;
+}
+
+// Function to search for an entry in the hash table by key
+Entry* search(HashTable* hashTable, int key) {
+    int index = hashFunction(key);
+
+    while (hashTable->entries[index] != NULL) {
+        if (hashTable->entries[index]->key == key) {
+            return hashTable->entries[index];
+        }
+        // Linear probing
+        index = (index + 1) % TABLE_SIZE;
+    }
+
+    return NULL;
+}
+
+// Function to display the hash table
+void displayHashTable(HashTable* hashTable) {
+    printf("Hash Table:\n");
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (hashTable->entries[i] != NULL) {
+            printf("Index %d: Key = %d, Value = %d\n", i, hashTable->entries[i]->key, hashTable->entries[i]->value);
+        } else {
+            printf("Index %d: NULL\n", i);
+        }
+    }
+}
+
+int main() {
+    HashTable* hashTable = createHashTable();
+
+    insert(hashTable, 10, 42);
+    insert(hashTable, 22, 63);
+    insert(hashTable, 33, 94);
+    insert(hashTable, 54, 17);
+    insert(hashTable, 43, 29);
+
+    displayHashTable(hashTable);
+
+    Entry* entry = search(hashTable, 33);
+    if (entry != NULL) {
+        printf("Found: Key = %d, Value = %d\n", entry->key, entry->value);
+    } else {
+        printf("Not found.\n");
+    }
+
+    entry = search(hashTable, 99);
+    if (entry != NULL) {
+        printf("Found: Key = %d, Value = %d\n", entry->key, entry->value);
+    } else {
+        printf("Not found.\n");
+    }
+
+    return 0;
+}

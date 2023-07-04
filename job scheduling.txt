@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Structure to represent a job
+typedef struct {
+    char id;
+    int deadline;
+    int profit;
+} Job;
+
+// Function to sort jobs in descending order of profit
+void sortJobs(Job jobs[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (jobs[j].profit < jobs[j + 1].profit) {
+                Job temp = jobs[j];
+                jobs[j] = jobs[j + 1];
+                jobs[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to schedule jobs and maximize profit
+void scheduleJobs(Job jobs[], int n) {
+    sortJobs(jobs, n);
+
+    bool timeSlots[n];
+    int maxProfit = 0;
+
+    for (int i = 0; i < n; i++)
+        timeSlots[i] = false;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = (jobs[i].deadline - 1); j >= 0; j--) {
+            if (!timeSlots[j]) {
+                timeSlots[j] = true;
+                maxProfit += jobs[i].profit;
+                break;
+            }
+        }
+    }
+
+    printf("Scheduled Jobs: ");
+    for (int i = 0; i < n; i++) {
+        if (timeSlots[i])
+            printf("%c ", jobs[i].id);
+    }
+    printf("\nTotal Profit: %d\n", maxProfit);
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of jobs: ");
+    scanf("%d", &n);
+
+    Job jobs[n];
+
+    printf("Enter job details (id, deadline, profit):\n");
+    for (int i = 0; i < n; i++) {
+        scanf(" %c %d %d", &jobs[i].id, &jobs[i].deadline, &jobs[i].profit);
+    }
+
+    scheduleJobs(jobs, n);
+
+    return 0;
+}

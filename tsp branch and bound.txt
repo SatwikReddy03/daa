@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <limits.h>
+#define MAX_N 10
+int n;
+int graph[MAX_N][MAX_N];
+int minCost = INT_MAX;
+int bestPath[MAX_N];
+void swap(int* a, int* b) {
+ int temp = *a;
+ *a = *b;
+ *b = temp;
+}
+int calculatePathCost(int path[]) {
+ int cost = 0;
+ for (int i = 0; i < n - 1; i++) {
+ cost += graph[path[i]][path[i + 1]];
+ }
+ cost += graph[path[n - 1]][path[0]];
+ return cost;
+}
+void TSPBranchAndBoundUtil(int path[], bool visited[], int level, int cost) {
+ if (level == n) {
+ int currentCost = cost + graph[path[level - 1]][path[0]];
+ if (currentCost < minCost) {
+ minCost = currentCost;
+ for (int i = 0; i < n; i++) {
+ bestPath[i] = path[i];
+ }
+ }
+ return;
+ }
+ for (int i = 0; i < n; i++) {
+ if (!visited[i]) {
+ path[level] = i;
+ visited[i] = true;
+ int newCost = cost + graph[path[level - 1]][i];
+ int lowerBound = 0;
+ for (int j = 0; j < n; j++) {
+ if (!visited[j]) {
+ int minEdgeCost = INT_MAX;
+ for (int k = 0; k < n; k++) {
+ if (graph[j][k] < minEdgeCost && j != k) {
+ minEdgeCost = graph[j][k];
+ }
+ }
+ lowerBound += minEdgeCost;
+ }
+ }
+ if (newCost + lowerBound < minCost) {
+ TSPBranchAndBoundUtil(path, visited, level + 1, newCost);
+ }
+ visited[i] = false;
+ }
+ }
+}
+void TSPBranchAndBound(int startingCity) {
+ int path[MAX_N];
+ bool visited[MAX_N];
+for (int i = 0; i < n; i++) {
+ visited[i] = false;
+ }
+ path[0] = startingCity;
+ visited[startingCity] = true;
+ TSPBranchAndBoundUtil(path, visited, 1, 0);
+ printf("Optimal TSP Path: ");
+ for (int i = 0; i < n; i++) {
+ printf("%d ", bestPath[i]);
+ }
+ printf("%d\n", bestPath[0]);
+ printf("Optimal TSP Cost: %d\n", minCost);
+}
+int main() {
+ printf("Enter the number of cities: ");
+ scanf("%d", &n);
+ printf("Enter the adjacency matrix of distances between cities:\n");
+ for (int i = 0; i < n; i++) {
+ for (int j = 0; j < n; j++) {
+ scanf("%d", &graph[i][j]);
+ }
+ }
+ int startingCity;
+ printf("Enter the starting city (0-%d): ", n - 1);
+ scanf("%d", &startingCity);
+ TSPBranchAndBound(startingCity);
+ return 0;
+}
